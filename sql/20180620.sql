@@ -14,15 +14,12 @@ group by msisdn, tag
 having count(*) >= 3);
 
 ----2(1)
-select  c.dept_name,a.name,a.salary
-from EMPLOYEE a,(select salary,departmentid,rn
-from (select salary,departmentid,ROW_NUMBER() OVER  (PARTITION BY departmentid  ORDER BY salary desc) rn
-from (select distinct salary,departmentid
-from EMPLOYEE))
-where rn<=3) b,DEPARTMENT c
-where a.departmentid=b.departmentid
-and a.salary<=b.salary
-and a.departmentid=c.departmentid;
+select b.dept_name,a.name,a.salary from 
+(select * from 
+(select a.*,row_number() over(partition by departmentid order by salary desc) rn
+from employee a) where rn <= 3) a,department b
+where a.departmentid=b.departmentid;
+
 
 ----3(1)
 select a.request_at, (case when b.request_at is not null then round(b.nomal_cancel / a.all_trip, 4)*100 || '%' else '0' end)
